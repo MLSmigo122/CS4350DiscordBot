@@ -8,6 +8,10 @@ namespace CheckersDiscordBot
 {
     public class Program
     {
+        static bool playing = false;
+        static IUser player1;
+        static IUser player2;
+
         public static async Task Main(string[] args)
         {
             // You should dispose a service provider created using ASP.NET
@@ -16,7 +20,7 @@ namespace CheckersDiscordBot
             // its documentation for the best way to do this.
             await using var services = ConfigureServices();
             var client = services.GetRequiredService<DiscordSocketClient>();
-            var listener = services.GetRequiredService<MyTCPListener>();
+            var listener = services.GetRequiredService<TCPHandler>();
 
             client.Log += LogAsync;
             services.GetRequiredService<CommandService>().Log += LogAsync;
@@ -46,15 +50,21 @@ namespace CheckersDiscordBot
             return new ServiceCollection()
                 .AddSingleton(new DiscordSocketConfig
                 {
-                    GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
+                    GatewayIntents = GatewayIntents.All//GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent
                 })
                 .AddSingleton<DiscordSocketClient>()
                 .AddSingleton<CommandService>()
                 .AddSingleton<CommandHandlingService>()
                 .AddSingleton<HttpClient>()
                 .AddSingleton<PictureService>()
-                .AddSingleton<MyTCPListener>()
+                .AddSingleton<TCPHandler>()
                 .BuildServiceProvider();
         }
+
+        public static void setPlaying(bool p) { playing = p; }
+        public static bool isPlaying() { return playing; }
+        public static void setPlayers(IUser user1, IUser user2) {player1 = user1; player2 = user2; }
+        public static IUser getPlayer1() { return player1; }
+        public static IUser getPlayer2() { return player2; }
     }
 }
