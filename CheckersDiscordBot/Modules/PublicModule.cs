@@ -8,7 +8,51 @@ namespace CheckersDiscordBot.Modules
     {
         //Dependency injecetion
         public PictureService PictureService { get; set; }
+        public TCPHandler tcphandler { get; set; }
 
+        bool playing = Program.isPlaying();
+        IUser player1 = Program.getPlayer1();
+        IUser player2 = Program.getPlayer2();
+
+        [Command("play")]
+        public async Task StartGame(IUser user)
+        {
+            if (!playing && !user.IsBot)
+            {
+                Program.setPlaying(true);
+                Program.setPlayers(Context.User, user);
+                //tcphandler.runListener();
+                Console.WriteLine("Game started");
+                Console.WriteLine("Player1: {0}", player1);
+            }
+            else
+            {
+                ReplyAsync("Game already running!");
+            }
+        }
+
+        [Command("move")]
+        public async Task Move(string from, string to)
+        {
+            Console.WriteLine("Player1: {0}", player1);
+            if (playing)
+            {
+                bool team;
+                if (Context.User == player1)
+                    team = false;
+                else if (Context.User == player2)
+                    team = true;
+                else
+                {
+                    ReplyAsync("You're not playing");
+                    return;
+                }
+                Console.WriteLine("Hello");
+                tcphandler.SendMove(team, from, to);
+            }
+            else
+                ReplyAsync("No game is being played");
+        }
 
         [Command("ping")]
         [Alias("pong", "hello")]
