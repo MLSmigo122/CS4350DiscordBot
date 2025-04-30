@@ -99,6 +99,8 @@ StyleCopReport.xml
 *.pidb
 *.svclog
 *.scc
+*.sln
+*/launchSettings.json
 
 # Chutzpah Test files
 _Chutzpah*
