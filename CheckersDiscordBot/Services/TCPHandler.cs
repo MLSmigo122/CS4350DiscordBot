@@ -89,52 +89,57 @@ namespace CheckersDiscordBot.Services
 
                 using TcpClient client = new TcpClient(server, port);
 
-                Byte[] byte_msg = new byte[256];
-
-                //string msg = "6392F4480000000701643600633500".PadRight(512, '0');
-                //string msg = "6392F44800000007006733006834".PadRight(512, '0');
-
+                //Build message
                 string header = "6392F448";
-
                 int size = (3+from.Length+to.Length);
                 string size_hex = size.ToString("X8");
+                string from_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(from.ToLower()));
+                string to_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(to.ToLower()));
+                string hex_message = ("0" + (team ? "1" : "0") + from_hex + "00" + to_hex + "00").PadRight(496, '0');
 
-                //Console.WriteLine("Size: {0}", size_hex);
-
-                string from_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(from));
-
-                string to_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(to));
-
-                string hex_message = ("0" + (team ? "1" : "0") + from_hex + "00" + to_hex).PadRight(496, '0');
-
-                Console.WriteLine("Test: {0}", header+size_hex+hex_message);
-
-                //Console.WriteLine("Sending: {0}", msg);
-
-                Byte[] data = Convert.FromHexString(header+size_hex+hex_message);//System.Text.Encoding.ASCII.GetBytes(msg);
-
-                Console.WriteLine("Sending: {0}", Convert.ToHexString(data));
+                Byte[] data = Convert.FromHexString(header+size_hex+hex_message);
 
                 NetworkStream stream = client.GetStream();
 
                 // Send the message to the connected TcpServer.
                 stream.Write(data, 0, data.Length);
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+        }
 
-                Console.WriteLine("Sent: {0}", data);
+        public void SendJump(bool team, string from, string[] jumps)
+        {
+            try
+            {
+                Int32 port = 12683;
+                string server = "127.0.0.1";
 
+                using TcpClient client = new TcpClient(server, port);
 
-                // Receive the server response.
+                //Build message
+                int num_jumps = jumps.Length;
+                string jumps_str = string.Join("", jumps);
+                string header = "394CEC41";
+                int size = (7 + from.Length + jumps_str.Length);
+                string size_hex = size.ToString("X8");
+                string num_jumps_hex = num_jumps.ToString("X8");
+                string from_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(from.ToLower()));
+                string to_hex = Convert.ToHexString(System.Text.Encoding.ASCII.GetBytes(jumps_str.ToLower()));
+                string hex_message = ("0" + (team ? "1" : "0") + num_jumps_hex + from_hex + "00" + to_hex + "00").PadRight(496, '0');
 
-                // Buffer to store the response bytes.
-                //data = new Byte[256];
+                Byte[] data = Convert.FromHexString(header + size_hex + hex_message);
 
-                //// String to store the response ASCII representation.
-                //string responseData = string.Empty;
+                NetworkStream stream = client.GetStream();
 
-                //// Read the first batch of the TcpServer response bytes.
-                //Int32 bytes = stream.Read(data, 0, data.Length);
-                //responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
-                //Console.WriteLine("Received: {0}", responseData);
+                // Send the message to the connected TcpServer.
+                stream.Write(data, 0, data.Length);
             }
             catch (ArgumentNullException e)
             {
