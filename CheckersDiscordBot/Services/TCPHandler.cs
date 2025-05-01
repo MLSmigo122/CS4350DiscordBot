@@ -1,10 +1,11 @@
-﻿using Discord.API;
-using System;
-using System.IO;
+﻿using Microsoft.Extensions.DependencyInjection;
+using CheckersDiscordBot.Modules;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using static System.Net.Mime.MediaTypeNames;
+using Discord.WebSocket;
+using Discord.Commands;
+using System.Windows.Input;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace CheckersDiscordBot.Services
@@ -54,6 +55,17 @@ namespace CheckersDiscordBot.Services
                         // Translate data bytes to a ASCII string.
                         //data = enc.GetString(bytes, 0, i);
                         data = Convert.ToHexString(bytes);
+                        if (data.Substring(0, 8) == "C32FA98A")
+                        {
+                            bool winner = false;
+                            if (data[17] == '1')
+                                winner = true;
+                            else if (data[17] == '0')
+                                winner = false;
+                            else
+                                Program.sendMsg("Unknown packet recieved");
+                            Program.sendMsg((winner ? "white" : "red") + " wins!");
+                        }
                         Console.WriteLine("Received: {0}", data);
 
                         // Process the data sent by the client.
