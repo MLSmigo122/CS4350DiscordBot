@@ -26,6 +26,7 @@ namespace CheckersDiscordBot.Modules
             }
             if (!playing && !user.IsBot)
             {
+                tcphandler.SendReset();
                 Program.setPlaying(true);
                 Program.setPlayers(Context.User, user);
                 Console.WriteLine("Game started");
@@ -34,6 +35,17 @@ namespace CheckersDiscordBot.Modules
             else
             {
                 ReplyAsync("Game unable to start");
+            }
+        }
+
+        [Command("forfeit")]
+        public async Task ForfeitGame()
+        {
+            if (playing)
+            {
+                IUser forfeitee = Context.User;
+                ReplyAsync(forfeitee + " forfeit the game");
+                Program.setPlaying(false);
             }
         }
 

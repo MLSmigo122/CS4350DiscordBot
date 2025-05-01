@@ -7,6 +7,7 @@ using Discord.WebSocket;
 using Discord.Commands;
 using System.Windows.Input;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using Discord;
 
 namespace CheckersDiscordBot.Services
 {
@@ -147,6 +148,36 @@ namespace CheckersDiscordBot.Services
                 string hex_message = ("0" + (team ? "1" : "0") + num_jumps_hex + from_hex + "00" + to_hex + "00").PadRight(496, '0');
 
                 Byte[] data = Convert.FromHexString(header + size_hex + hex_message);
+
+                NetworkStream stream = client.GetStream();
+
+                // Send the message to the connected TcpServer.
+                stream.Write(data, 0, data.Length);
+            }
+            catch (ArgumentNullException e)
+            {
+                Console.WriteLine("ArgumentNullException: {0}", e);
+            }
+            catch (SocketException e)
+            {
+                Console.WriteLine("SocketException: {0}", e);
+            }
+        }
+
+        public void SendReset()
+        {
+            try
+            {
+                Int32 port = 12683;
+                string server = "127.0.0.1";
+
+                using TcpClient client = new TcpClient(server, port);
+
+                //Build message
+                string header = "7CFC7CA4";
+                string fill = ("").PadRight(504, '0');
+
+                Byte[] data = Convert.FromHexString(header + fill);
 
                 NetworkStream stream = client.GetStream();
 
