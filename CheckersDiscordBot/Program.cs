@@ -1,4 +1,5 @@
-﻿using CheckersDiscordBot.Services;
+﻿using CheckersDiscordBot.Modules;
+using CheckersDiscordBot.Services;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
@@ -9,6 +10,7 @@ namespace CheckersDiscordBot
     public class Program
     {
         static bool playing = false;
+        static ISocketMessageChannel channel;
         static IUser player1;
         static IUser player2;
 
@@ -58,13 +60,16 @@ namespace CheckersDiscordBot
                 .AddSingleton<HttpClient>()
                 .AddSingleton<PictureService>()
                 .AddSingleton<TCPHandler>()
+                .AddSingleton<PublicModule>()
                 .BuildServiceProvider();
         }
 
         public static void setPlaying(bool p) { playing = p; }
         public static bool isPlaying() { return playing; }
+        public static void setChannel(ISocketMessageChannel ch) { channel = ch; }
         public static void setPlayers(IUser user1, IUser user2) {player1 = user1; player2 = user2; }
         public static IUser getPlayer1() { return player1; }
         public static IUser getPlayer2() { return player2; }
+        public static void sendMsg(string msg) { channel.SendMessageAsync(msg); }
     }
 }

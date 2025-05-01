@@ -1,6 +1,7 @@
 ﻿using CheckersDiscordBot.Services;
 using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 
 namespace CheckersDiscordBot.Modules
 {
@@ -17,6 +18,7 @@ namespace CheckersDiscordBot.Modules
         [Command("play")]
         public async Task StartGame(IUser user)
         {
+            Program.setChannel(Context.Channel);
             if (user == null)
             {
                 ReplyAsync("Please mention a user to play against");
@@ -24,6 +26,7 @@ namespace CheckersDiscordBot.Modules
             }
             if (!playing && !user.IsBot)
             {
+                tcphandler.SendReset();
                 Program.setPlaying(true);
                 Program.setPlayers(Context.User, user);
                 Console.WriteLine("Game started");
@@ -32,6 +35,17 @@ namespace CheckersDiscordBot.Modules
             else
             {
                 ReplyAsync("Game unable to start");
+            }
+        }
+
+        [Command("forfeit")]
+        public async Task ForfeitGame()
+        {
+            if (playing)
+            {
+                IUser forfeitee = Context.User;
+                ReplyAsync(forfeitee + " forfeit the game");
+                Program.setPlaying(false);
             }
         }
 
