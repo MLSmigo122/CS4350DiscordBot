@@ -66,6 +66,7 @@ namespace CheckersDiscordBot.Services
                             else
                                 Program.sendMsg("Unknown packet recieved");
                             Program.sendMsg((winner ? "white" : "red") + " wins!");
+                            Program.setPlaying(false);
                         }
                         Console.WriteLine("Received: {0}", data);
 
